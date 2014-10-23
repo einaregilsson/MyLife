@@ -2,7 +2,6 @@
 import webapp2, logging
 from templates import get_template
 
-from handlers.about import AboutHandler
 from handlers.calendar import CalendarHandler
 from handlers.dataupgrade import DataUpgradeHandler
 from handlers.edit import EditHandler, AddPhotoHandler, GetPhotoUploadUrlHandler, DeletePhotoHandler
@@ -19,7 +18,6 @@ from handlers.upload import UploadFinishedHandler, ImportHandler, ImportStatusHa
 
 app = webapp2.WSGIApplication([
 	(r'/', FrontPageHandler),
-	(r'/about', AboutHandler),
 	(r'/api/addphoto', AddPhotoHandler),
 	(r'/api/photouploadurl', GetPhotoUploadUrlHandler),
 	(r'/api/(\d\d\d\d)-(\d\d)-(\d\d)/(next|prev|random)', FrontPagePostHandler),
