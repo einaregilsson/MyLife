@@ -1,0 +1,45 @@
+
+application: yourpersonalappidhere 
+# Or, just leave this as is, and use the command
+#
+#    appcfg.py -A yourrealappid update . 
+#
+# to deploy the app. At least if you fork this on GitHub I would recommend 
+# to not commit this file with your real appid. The journal is private,
+# so there should be no need for others to know your appid, and if they
+# don't know it they can't try to send emails to the mail handler, or
+# otherwise try to mess with your site. (You know, because people are
+# just lining up to try to DDOS your personal journal ;)
+
+version: 1
+runtime: python27
+api_version: 1
+threadsafe: yes
+
+builtins:
+- remote_api: on
+
+handlers:
+
+- url: /css
+  static_dir: css
+
+- url: /js
+  static_dir: js
+
+- url: /robots\.txt
+  static_files: robots.txt
+  upload: robots\.txt
+
+- url: .*
+  script: main.app
+  login: admin
+
+libraries:
+- name: webapp2
+  version: "2.5.2"
+- name: jinja2
+  version: latest  
+
+inbound_services:
+- mail

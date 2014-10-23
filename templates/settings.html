@@ -1,0 +1,62 @@
+{% extends 'index.html' %}
+
+
+{%block main_content%}
+<h3>Settings</h3>
+
+<div id="user-settings">
+	<form method="POST" action="/settings">
+		<label for="email-hour">What time should your daily email arrive?</label>
+		<label for="timezone" id="tz-label">Time</label>
+		<select name="email-hour">
+			{%for hour in range(0, 24)%}
+				<option value="{{hour}}"{%if email_hour==hour%} selected="selected"{%endif%}>{{'%02d:00' % hour}}</option>
+			{%endfor%}
+		</select>
+		<select name="timezone">
+		{% for value, text, _ in timezones%}
+			<option value="{{value}}"{%if timezone==value%} selected="selected"{%endif%}>{{text}}</option>
+		{% endfor %}
+		</select>
+
+		<label for="email-address">Which email address do you want to use?</label>
+		<input type="text" name="email-address" id="email-address" value="{{email_address}}" />
+
+		<label for="include-old-entry">Should the email include an old post?</label>
+		<input type="radio" name="include-old-entry" value="yes"{%if include_old_post_in_entry%} checked="checked"{%endif%}/ ><span class="radio">Yes</span>
+		<input type="radio" name="include-old-entry" value="no"{%if not include_old_post_in_entry%} checked="checked"{%endif%} /><span class="radio">No</span>
+		<div class="button-container">
+			<button type="submit" class="save">Save settings</button>
+		</div>
+		{%if saved%}
+		<div class="save-message">Your settings were saved.</div>
+		{%endif%}
+	</form>
+</div>
+
+<div id="import">
+	<h3>Import OhLife entries</h3>
+
+	<form id="import-form"><input id="zip" name="zip" class="input-file" type="file"></form>
+	<div class="button-container">
+		<button id="upload" name="upload" data-upload-url="{{upload_url}}" disabled="disabled">Upload zip file</button>
+	</div>
+	<p id="import-progress" class="progress">No file chosen yet</p>
+</div>
+<div id="export">
+	<h3>Export MyLife entries</h3>
+	<div class="button-container">
+		<button id="export-entries" name="export">Export all entries</button>
+	</div>
+	<p id="export-progress" class="progress"></p>
+</div>
+
+{%endblock%}
+
+{%block stylesheets%}
+<link rel="stylesheet" href="/css/settings.css">
+{%endblock%}
+
+{%block scripts%}
+	<script src="/js/settings.js"></script>
+{%endblock%}

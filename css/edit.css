@@ -1,0 +1,93 @@
+.post textarea {
+	width:90%;
+	margin: 20px auto;
+	display:block;
+	height:400px;
+	font-size:16px;
+	padding:4px;
+	border-radius:2px;
+	box-shadow: grey 0 0 2px;
+}
+
+#transparent-background {
+	display:none;
+	position:fixed;
+	width:100%;
+	height:100%;
+	top:0;
+	left:0;
+	background-color: #333;
+    opacity: 0.8;
+    z-index:100;
+}
+
+button {
+	margin:10px 10px;
+	width:120px;
+}
+
+.dialog {
+	position:fixed;
+	display:none;
+	background:white;
+	width:320px;
+	height:115px;
+	margin-left:-170px;
+	margin-top:-66px;
+	top:50%;
+	left:50%;
+	border-radius:4px;
+	border:solid 1px black;
+	z-index: 300;
+	padding:10px;	
+}
+
+.dialog h4 {
+	margin-bottom:15px;
+}
+@media (max-width: 500px) {
+  .post button {
+    display: block;
+    margin:5px auto;
+  }
+}
+
+#upload-photo-progress {
+	font-size:12px;
+	text-align: center;
+	margin-top:8px;
+}
+
+#photo {
+	margin:auto;
+	display:block;
+}
+
+.post-images {
+	width:90%;
+	margin:auto;
+	text-align: center;
+}
+.post-images div {
+	display:inline-block;
+	padding:5px;
+}
+
+.post-images div a.fullsize-image {
+	display:block;
+	width:180px;
+	height:135px;
+}
+
+.delete-img {
+	font-size:12px;
+}
+
+.thumbnail {
+	display:block;
+	margin:auto;
+	display:block;
+	max-width:100%;
+	max-height:100%;
+	box-shadow: grey 0 0 2px;
+}

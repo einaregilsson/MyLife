@@ -1,0 +1,33 @@
+#past-navigation {
+	text-align: center;
+	margin:10px 0px 2px 0px;
+}
+
+#archive {
+	display:inline-block;
+	position:relative;
+	top:-5px;
+}
+
+#past-navigation span {
+	font-size:34px;
+	padding:0px;
+	display:inline-block;
+}
+
+.edit-menu {
+	width:200px;
+	margin:auto;
+	text-align:center;
+	border:solid 1px black;
+	display:none;
+	margin-top:-20px;
+	background-color: white;
+	opacity: 1.0;
+}
+
+small {
+	text-align: center;
+	display:block;
+	font-size:10px;
+}

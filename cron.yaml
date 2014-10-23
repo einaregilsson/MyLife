@@ -1,0 +1,4 @@
+cron:
+- description: Send daily post
+  url: /sendmail
+  schedule: every 60 minutes synchronized

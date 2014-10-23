@@ -1,0 +1,190 @@
+* {
+	margin:0;
+	padding:0;
+}
+
+html {
+	background:#fafafa;
+}
+
+body {
+	font-family: Helvetica, Verdana, Arial, sans-serif;
+}
+
+header {
+	background:#649cc7;
+	color:white;
+}
+
+header a, header a:visited {
+	color:#eee;
+	text-decoration:none;
+	display:block;
+}
+
+#inner-header {
+	max-width:700px;
+	margin:auto;
+	height:50px;
+}
+
+footer {
+	font-size:12px;
+	text-align: center;
+	padding:20px;
+}
+
+header ul {
+	float:right;
+}
+
+header ul li {
+	display: inline-block;
+}
+
+header ul li a {
+	display:block;
+	height:50px;
+	line-height: 50px;
+	padding:0px 10px;
+}
+
+header ul li a:hover {
+	background:#538bb6;
+	color:white;
+}
+
+header #logo {
+	padding-left:8px;
+	float:left;
+	text-transform: lowercase;
+	transform:rotate(-8deg);
+	-webkit-transform:rotate(-8deg);
+	-ms-transform:rotate(-8deg);
+	height:50px;
+	line-height: 50px;
+}
+
+h1,h2,h3,h4,h5 {
+	text-align:center;
+}
+
+button {
+	font: normal normal normal 13px/13px Arial,sans-serif;
+	padding:5px;
+	border:solid 1px #888;
+	border-radius:3px;
+	color: #000;
+	text-shadow: 0 1px 1px rgba(255,255,255,1);	
+	background: #eee;
+	background: linear-gradient(to bottom,#fff,#ddd);
+	cursor: pointer;
+	display: inline-block;
+}
+
+button:hover {
+	border:solid 1px #222;
+	background: linear-gradient(to bottom,#ddd,#fff);
+}
+
+button:active {
+	background:#ddd;
+}
+
+button:disabled {
+	color:#aaa;
+	background:#f0f0f0;
+	border:solid 1px #888;
+}
+
+
+#content {
+	max-width:720px;
+	margin:auto;
+	padding:10px;
+}
+
+
+/* Shared styles for everything */
+
+
+h3 {
+	font-family: Arial, sans-serif;
+	font-size:22px;
+	color: #a41100;
+	margin-top:20px;
+}
+
+h3 a, h3 a:visited {
+	color: #a41100 !important;
+}
+
+h3 a:hover {
+	color:black !important;
+}
+h4 {
+	font-family: 'Open Sans', Arial, sans-serif;
+	font-size:16px;
+	color:#aaa;
+}
+
+p {
+	font-family: 'Open Sans', Arial, sans-serif;
+	font-size:18px;
+}
+
+h2 {
+	padding:20px;
+}
+
+.image {
+	text-align:center;
+	margin:10px;
+}
+
+.image img {
+	box-shadow: #333 0px 0px 4px;	
+	max-width:90%;
+}
+
+
+.active {
+	background:#538bb6;
+}
+
+.clear {
+	clear:both;
+}
+
+p {
+	margin:10px 0px;
+	padding:2px;
+	line-height: 1.5em;
+}
+
+
+/* Links */
+a, a:visited {
+	text-decoration: none;
+	color:#649cc7;
+}
+
+a:hover {
+	color:black;
+}
+
+.disabled {
+	cursor:text;
+	color:#ddd !important;
+}
+
+.button-container {
+	text-align: center;
+}
+
+
+
+
+
+
+

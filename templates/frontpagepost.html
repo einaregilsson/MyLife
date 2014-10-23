@@ -1,0 +1,39 @@
+{% if post %}
+	<div class="find-post">
+		{% if is_oldest %}
+		<span class="disabled">Older</span>
+		{%else%}
+		<a id="prev" href="#prev" data-url="/api/{{post.date_string()}}/prev">Older</a>
+		{%endif%}
+		| <a id="random" href="#random" data-url="/api/{{post.date_string()}}/random">Random</a> |
+		{% if is_newest %}
+		<span class="disabled">Newer</span>
+		{% else %}
+		<a id="next" href="#next" data-url="/api/{{post.date_string()}}/next">Newer</a>
+		{%endif%}
+	</div>
+	<div class="post">
+		<h3><a title="Edit this post" href="/edit/{{post.date_string()}}">{{post.date.strftime('%B')}} {{post.date.day}}, {{post.date.year}}</a></h3>
+		<h4>{{post.date.strftime('%A')}}</h4>
+
+		{%if post.images %}
+			{%for img in post.images%}
+				<div class="image">
+					<a href="/image/{{img}}?fullsize=1"><img src="/image/{{img}}"/></a>
+				</div>
+			{%endfor%}
+		{%endif%}
+		
+		<div class="post-text">{{post.text|nl2br}}</div>
+	</div>
+{%else%}
+	<div class="post">
+		<p>
+			Hi there. 
+		</p>
+		<p>
+			Looks like you don't have any posts yet. Maybe you should <a href="/write">write one</a>,
+			or <a href="/settings">configure your daily email?
+		</p>
+	</div>
+{%endif%}

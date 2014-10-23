@@ -1,0 +1,56 @@
+{% extends 'index.html' %}
+
+
+{%block main_content%}
+
+	
+<div class="post">
+	<h3>{{date.strftime('%B')}} {{date.day}}, {{date.year}}</h3>
+	<h4>{{date.strftime('%A')}}</h4>
+	<form method="POST">
+		<textarea name="text">{{text}}</textarea>
+		<input type="hidden" id="action" name="action" value="save" />
+		<div class="button-container">
+			<button type="submit" id="save-entry" name="save-entry">Save Entry</button>
+			{%if kind =="edit"%}
+			<button type="submit" id="delete-entry" name="delete-entry">Delete Entry</button>
+			{%endif%}
+			<button id="add-photo-button" name="add-photo">Add Photo</button>
+		</div>
+	</form>
+
+	<div class="post-images">
+		{%for img in images%} 
+		<div>
+			<a href="/image/{{img}}?fullsize=1" target="_blank" class="fullsize-image"><img src="/image/{{img}}" class="thumbnail" /></a>
+			<a class="delete-img" href="#delete-image" data-img="{{img}}">Delete</a>
+		</div>
+		{%endfor%}
+	</div>
+
+</div>
+
+<div id="transparent-background">
+</div>
+<div class="dialog">
+	<h4>Select a photo from your computer</h4>
+	<form id="fileform"><input type="file" id="photo"/></form>
+	<input type="hidden" id="year" value="{{date.year}}" />
+	<input type="hidden" id="month" value="{{date.month}}" />
+	<input type="hidden" id="day" value="{{date.day}}" />
+	<div id="upload-photo-progress">&nbsp;</div>
+	<div class="button-container">
+		<button id="upload-photo-button" disabled="disabled">Upload photo</button>
+		<button id="cancel-add-photo-button">Cancel</button>
+	</div>
+</div>
+
+{%endblock%}
+
+{%block stylesheets%}
+<link rel="stylesheet" href="/css/edit.css">
+{%endblock%}
+
+{%block scripts%}
+<script src="/js/edit.js"></script>
+{%endblock%}

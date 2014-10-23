@@ -1,0 +1,61 @@
+{% extends 'index.html' %}
+
+
+{%block main_content%}
+
+<div id="past-navigation">
+	{%if prev %}
+		<span><a href="{{prev}}">«</a></span>
+	{%else%}
+		<span class="disabled">«</span>
+	{% endif %}
+	<select id="archive">
+		{% for val, descr, selected in archive%}
+			<option value="{{val}}"{%if selected%} selected="selected"{%endif%}>{{descr}}</option>
+		{% endfor %}
+	</select>
+	{%if next %}
+		<span><a href="{{next}}">»</a></span>
+	{%else%}
+		<span class="disabled">»</span>
+	{% endif %}
+</div>
+
+<small>(Click on date headers to edit posts)</small>
+
+{% if not posts%}
+<div class="post">
+	<p>
+		There are no posts for {{month}}. Maybe you should <a href="/write">write one?</a>
+	</p>
+</div>
+{% else %}
+{% for post in posts%}
+	
+<div class="post" id="day-{{post.date.day}}">
+	<h3>
+		<a href="/edit/{{post.date_string()}}" title="Edit this post">{{post.date.strftime('%B')}} {{post.date.day}}, {{post.date.year}}</a>
+	</h3>
+	<h4>{{post.date.strftime('%A')}}</h4>
+	{%if post.images %}
+	{%for img in post.images%}
+		<div class="image">
+			<a href="/image/{{img}}?fullsize=1"><img src="/image/{{img}}" /></a>
+		</div>
+	{%endfor%}
+	{%endif%}
+	<div>{{post.text|nl2br}}</div>
+</div>
+<hr>
+{%endfor%}
+{%endif%}
+{%endblock%}
+
+{%block scripts%}
+<script src="/js/past.js"></script>
+{%endblock%}
+
+{%block stylesheets%}
+<link rel="stylesheet" href="/css/past.css">
+{%endblock%}
+
