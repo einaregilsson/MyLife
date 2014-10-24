@@ -54,7 +54,13 @@ function displayDate(date) {
 		} else {
 			$(id).html('<a href="/write/' + date.getFullYear() + '-' + zpad(date.getMonth()+1) + '-' + zpad(i) + '">' + i + '</a>');
 		}
-	}	
+	}
+
+	if (days + offset >= 36) { //Ugly to have empty last line
+		$('#lastline').show();
+	} else {
+		$('#lastline').hide();
+	}
 
 	var dateKey = (date.getFullYear() + '-' + (date.getMonth()+1)).replace(/-(\d)$/, '-0$1');
 	currentDateKey = dateKey;
