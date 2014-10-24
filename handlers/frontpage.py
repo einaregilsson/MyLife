@@ -3,10 +3,12 @@ from templates import get_template
 from models.post import Post
 from models.postcounter import PostCounter
 from models.settings import Settings
+from models.slug import Slug
+from models.dailymail import DailyMail
 
 class FrontPageHandler(webapp2.RequestHandler):
 	def get(self):
-		Settings.get() #Force email address update...
+		settings = Settings.get() #Force email address update...
 		posts = Post.query().order(-Post.date).fetch(1)
 		is_newest = True
 		if posts:
@@ -15,12 +17,24 @@ class FrontPageHandler(webapp2.RequestHandler):
 		else:
 			post = None
 			is_oldest = True
+
+
+		#See if this is the very first time we've been here. In that case
+		#send an email immediately to get people started...
+		first_time = False
+		
+		if not Slug.query().get() and not Post.query().get():
+			first_time = True
+			DailyMail().send(True)
+
 		self.response.write(get_template('frontpage.html').render(
 			{
 				"page":"frontpage", 
 				"post":post, 
 				"is_oldest" : is_oldest,
-				"is_newest" : is_newest
+				"is_newest" : is_newest,
+				"first_time" : first_time,
+				"email" : settings.email_address
 			}))
 
 class FrontPagePostHandler(webapp2.RequestHandler):

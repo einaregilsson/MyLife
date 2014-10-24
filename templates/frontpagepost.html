@@ -27,6 +27,18 @@
 		<div class="post-text">{{post.text|nl2br}}</div>
 	</div>
 {%else%}
+	{%if first_time%}
+	<div class="post">
+		<p>
+			Hi there. 
+		</p>
+		<p>
+			Welcome to MyLife. We have just sent you an email to {{email}}. You can try the system out right away by replying to that email and then looking at the <a href="/past">archive</a> to see that your reply arrived and was parsed correctly. 
+			In the future an email will be sent once a day and will include an old email if possible. You can configure when you get
+			your daily email and which email address to use on the <a href="/settings">settings</a> page. 
+		</p>
+	</div>
+	{%else%}
 	<div class="post">
 		<p>
 			Hi there. 
@@ -36,4 +48,5 @@
 			or <a href="/settings">configure your daily email?
 		</p>
 	</div>
+	{%endif%}
 {%endif%}
