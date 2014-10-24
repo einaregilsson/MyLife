@@ -23,17 +23,21 @@ handlers:
 
 - url: /css
   static_dir: css
+  secure: always
 
 - url: /js
   static_dir: js
+  secure: always
 
 - url: /robots\.txt
   static_files: robots.txt
   upload: robots\.txt
+  secure: always
 
 - url: .*
   script: main.app
   login: admin
+  secure: always
 
 libraries:
 - name: webapp2
