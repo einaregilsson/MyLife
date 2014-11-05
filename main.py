@@ -4,6 +4,7 @@ from templates import get_template
 
 from handlers.calendar import CalendarHandler
 from handlers.dataupgrade import DataUpgradeHandler
+from handlers.dropbox import DropboxBackupHandler
 from handlers.edit import EditHandler, AddPhotoHandler, GetPhotoUploadUrlHandler, DeletePhotoHandler
 from handlers.export import ExportHandler, ExportDeleteHandler, ExportDownloadHandler, ExportStartHandler, ExportStatusHandler
 from handlers.frontpage import FrontPageHandler, FrontPagePostHandler
@@ -23,6 +24,7 @@ app = webapp2.WSGIApplication([
 	(r'/api/(\d\d\d\d)-(\d\d)-(\d\d)/(next|prev|random)', FrontPagePostHandler),
 	(r'/write', CalendarHandler),
 	(r'/dataupgrade', DataUpgradeHandler),
+	(r'/backup/dropbox', DropboxBackupHandler),
 	(r'/(edit|write)/(\d\d\d\d)-(\d\d)-(\d\d)', EditHandler),
 	(r'/export/delete', ExportDeleteHandler),
 	(r'/export/download/(.*)', ExportDownloadHandler),

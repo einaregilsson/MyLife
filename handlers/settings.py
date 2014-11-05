@@ -14,6 +14,7 @@ class SettingsHandler(webapp2.RequestHandler):
 		settings.email_address = self.request.get('email-address')
 		settings.timezone = self.request.get('timezone')
 		settings.email_hour = int(self.request.get('email-hour'))
+		settings.dropbox_access_token = self.request.get('dropbox-access-token')
 		settings.include_old_post_in_entry = self.request.get('include-old-entry') == 'yes'
 		settings.put()
 		self._render(settings, True)
@@ -22,6 +23,7 @@ class SettingsHandler(webapp2.RequestHandler):
 		data = {
 			"page" : "settings",
 			"email_address" : settings.email_address,
+			"dropbox_access_token" : settings.dropbox_access_token or "",
 			"timezone" : settings.timezone,
 			"timezones" : timezones,
 			"email_hour" : settings.email_hour,

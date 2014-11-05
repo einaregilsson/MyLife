@@ -8,6 +8,8 @@ class Settings(ndb.Model):
 	timezone = ndb.StringProperty(default="America/Los_Angeles")
 	email_hour = ndb.IntegerProperty(default=20)
 	include_old_post_in_entry = ndb.BooleanProperty(default=True)
+	dropbox_access_token = ndb.StringProperty(required=False)
+	dropbox_last_backup = ndb.DateTimeProperty(required=False)
 	
 	@classmethod
  	def get(cls):

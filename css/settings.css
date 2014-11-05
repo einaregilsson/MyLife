@@ -23,6 +23,16 @@
 	font-size:12px;
 }
 
+#dropbox-accesss-token {
+	width:400px;
+}
+
+#dropbox-explanation {
+	font-size:12px;
+	width:400px;
+	margin:auto;
+}
+
 .save-message {
 	text-align: center;
 	color:green;

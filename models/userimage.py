@@ -10,6 +10,7 @@ class UserImage(ndb.Model):
 	filename = ndb.StringProperty()
 	date = ndb.DateProperty()
 	created = ndb.DateTimeProperty(auto_now_add=True)
+	backed_up_in_dropbox = ndb.BooleanProperty(required=False, default=False)
 
 	@classmethod
 	def create_image_name(cls, original_filename, date, existing_images):
