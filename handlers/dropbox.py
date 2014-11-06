@@ -29,15 +29,11 @@ class DropboxBackupHandler(webapp2.RequestHandler):
 				'Authorization' : 'Bearer ' + settings.dropbox_access_token
 			}
 
-			result = self.get_dropbox_filelist(settings.dropbox_access_token, headers)
-
-			files_in_dropbox = [m['path'][1:] for m in result['contents']]
-
 			posts = [p for p in Post.query().order(Post.date).fetch()]
 
 			self.log('Backing up %s posts to Dropbox' % len(posts))
 			post_text = ''
-			for p in Post.query().order(Post.date).fetch():
+			for p in posts:
 				post_text += p.date.strftime('%Y-%m-%d')
 				post_text += '\r\n\r\n'
 				post_text += p.text.replace('\r\n', '\n').replace('\n', '\r\n').rstrip()
@@ -45,6 +41,12 @@ class DropboxBackupHandler(webapp2.RequestHandler):
 
 			result = self.put_file(headers, 'MyLife.txt', post_text.encode('utf-8'))
 			self.log('Backed up posts. Revision: %s' % result['revision'])
+
+			result = self.get_dropbox_filelist(settings.dropbox_access_token, headers)
+
+			self.log('Fetching Dropbox file list')
+			
+			files_in_dropbox = [m['path'][1:] for m in result['contents']]
 			
 			self.log('Fetching images...')
 			images = [i for i in UserImage.query().order(UserImage.date).fetch()]
