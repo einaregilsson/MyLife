@@ -11,6 +11,7 @@ from models.postcounter import PostCounter
 import re, logging, exceptions, traceback, webapp2, json, datetime
 from errorhandling import log_error
 from google.appengine.api import urlfetch
+from StringIO import StringIO
 
 class DropboxBackupHandler(webapp2.RequestHandler):
 	def get(self):
@@ -32,14 +33,15 @@ class DropboxBackupHandler(webapp2.RequestHandler):
 			posts = [p for p in Post.query().order(Post.date).fetch()]
 
 			self.log('Backing up %s posts to Dropbox' % len(posts))
-			post_text = ''
+			post_text = StringIO()
 			for p in posts:
-				post_text += p.date.strftime('%Y-%m-%d')
-				post_text += '\r\n\r\n'
-				post_text += p.text.replace('\r\n', '\n').replace('\n', '\r\n').rstrip()
-				post_text += '\r\n\r\n'
+				post_text.write(p.date.strftime('%Y-%m-%d'))
+				post_text.write('\r\n\r\n')
+				post_text.write(p.text.replace('\r\n', '\n').replace('\n', '\r\n').rstrip())
+				post_text.write('\r\n\r\n')
 
-			result = self.put_file(headers, 'MyLife.txt', post_text.encode('utf-8'))
+			result = self.put_file(headers, 'MyLife.txt', post_text.getvalue().encode('utf-8'))
+			post_text.close()
 			self.log('Backed up posts. Revision: %s' % result['revision'])
 
 			result = self.get_dropbox_filelist(settings.dropbox_access_token, headers)
