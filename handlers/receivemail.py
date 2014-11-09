@@ -153,7 +153,7 @@ class ReceiveMailHandler(InboundMailHandler):
 				
 				post.has_images = True
 				user_image = UserImage()
-				img_name = UserImage.create_image_name(original_filename, date, post.images)
+				img_name = UserImage.create_image_name(original_filename, post.date, post.images)
 				user_image.import_image(img_name, original_filename, bytes, post.date)
 				post.images.append(img_name)
 				user_image.put()
