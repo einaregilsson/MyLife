@@ -80,3 +80,9 @@ fieldset label {
 	display:inline-block;
 	font-size:0.8em;
 }
+
+#version {
+	margin-top:20px;
+	font-size:12px;
+	text-align:center;
+}

@@ -3,7 +3,7 @@ from templates import get_template
 from models.settings import Settings
 from models.timezones import timezones
 from models.migratetask import MigrateTask
-
+from google.appengine.api import modules
 class SettingsHandler(webapp2.RequestHandler):
 	def get(self):
 		self._render(Settings.get())
@@ -30,6 +30,7 @@ class SettingsHandler(webapp2.RequestHandler):
 			"include_old_post_in_entry" : settings.include_old_post_in_entry,
 			"upload_url" : filestore.create_upload_url('/upload-finished'),
 			"saved" : saved,
-			"can_migrate_images" : not bool(MigrateTask.query(MigrateTask.status == 'finished').get())
+			"can_migrate_images" : not bool(MigrateTask.query(MigrateTask.status == 'finished').get()),
+			"version" : open('VERSION').read()
 		}
 		self.response.write(get_template('settings.html').render(data))
