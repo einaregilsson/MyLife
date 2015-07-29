@@ -1,8 +1,8 @@
-import webapp2
+import webapp2, filestore
 from templates import get_template
 from models.settings import Settings
 from models.timezones import timezones
-from google.appengine.ext import blobstore
+from models.migratetask import MigrateTask
 
 class SettingsHandler(webapp2.RequestHandler):
 	def get(self):
@@ -28,7 +28,8 @@ class SettingsHandler(webapp2.RequestHandler):
 			"timezones" : timezones,
 			"email_hour" : settings.email_hour,
 			"include_old_post_in_entry" : settings.include_old_post_in_entry,
-			"upload_url" : blobstore.create_upload_url('/upload-finished'),
-			"saved" : saved
+			"upload_url" : filestore.create_upload_url('/upload-finished'),
+			"saved" : saved,
+			"can_migrate_images" : not bool(MigrateTask.query(MigrateTask.status == 'finished').get())
 		}
 		self.response.write(get_template('settings.html').render(data))

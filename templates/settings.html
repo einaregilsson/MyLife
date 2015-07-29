@@ -58,6 +58,18 @@
 	<p id="export-progress" class="progress"></p>
 </div>
 
+{%if can_migrate_images %}
+<div id="migrate-to-gcs">
+	<h3>Migrate images to Google Cloud Storage</h3>
+	<p>You appear to have {{images_in_blobstore}} images that are only stored in the Blobstore.  Press the button below to import these images into Google Cloud Storage, where all images will be kept from now on. If you have not enabled Google Cloud Storage for this App Engine app, please <a href="https://cloud.google.com/appengine/docs/python/googlecloudstorageclient/activate">follow these instructions</a> to do so before migrating the images.</p>
+
+	<div class="button-container">
+		<button id="migrate-to-gcs" name="migrate-to-gcs">Migrate images to Google Cloud Storage</button>
+	</div>
+	<p id="migrate-progress" class="progress"></p>
+</div>
+{%endif%}
+
 {%endblock%}
 
 {%block stylesheets%}

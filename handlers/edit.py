@@ -1,38 +1,38 @@
-import webapp2, datetime, logging, json
+import webapp2, datetime, logging, json, filestore
 from templates import get_template
 from models.post import Post
 from models.postcounter import PostCounter
 from models.userimage import UserImage
 from models.rawmail import RawMail
-from google.appengine.ext import blobstore
 from google.appengine.ext.webapp import blobstore_handlers
+from google.appengine.api import app_identity
 
 	
 class GetPhotoUploadUrlHandler(webapp2.RequestHandler):
 	def get(self):
 		self.response.headers['Content-Type'] = "application/json"
-		self.response.write(json.dumps({"upload_url" : blobstore.create_upload_url('/api/addphoto')}))
+		self.response.write(json.dumps({"upload_url" : filestore.create_upload_url('/api/addphoto')}))
 
 class AddPhotoHandler(blobstore_handlers.BlobstoreUploadHandler):
 	def post(self):
-		upload = self.get_uploads()[0]
+		file_info = self.get_file_infos()[0]
 		self.response.headers['Content-Type'] = "application/json"
 		year = self.request.get('year')
 		month = self.request.get('month')
 		day = self.request.get('day')
 		date = datetime.datetime(int(year), int(month), int(day))
 
-		if upload.content_type.lower() not in ('image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/bmp'):
-			return self.response.write(json.dumps({"status" : "error", "message" : "Unsupported content type: " + upload.content_type}))
+		if file_info.content_type.lower() not in ('image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/bmp'):
+			return self.response.write(json.dumps({"status" : "error", "message" : "Unsupported content type: " + file_info.content_type}))
 
-		bytes = upload.open().read()
+		bytes = filestore.read(file_info.gs_object_name)
 		existing_images = [u.filename for u in UserImage.query(UserImage.date == date).fetch()]
 
-		filename = UserImage.create_image_name(upload.filename, date, existing_images)
+		filename = UserImage.create_image_name(file_info.filename, date, existing_images)
 		img = UserImage()
-		img.import_image(filename, upload.filename, bytes, date)
+		img.import_image(filename, file_info.filename, bytes, date)
 		img.put()
-		blobstore.delete(upload.key())
+		filestore.delete(file_info.gs_object_name)
 		#If there's a post here we should add the image...
 		post = Post.query(Post.date == date).get()
 		if post:
@@ -65,8 +65,8 @@ class DeletePhotoHandler(webapp2.RequestHandler):
 
 			post.put()
 
-		blobstore.delete(img.serving_size_key)
-		blobstore.delete(img.original_size_key)
+		filestore.delete(img.serving_size_key)
+		filestore.delete(img.original_size_key)
 		img.key.delete()
 
 		self.response.write(json.dumps({"status" : "ok"}))
@@ -140,8 +140,8 @@ class EditHandler(webapp2.RequestHandler):
 		images = UserImage.query(UserImage.date == post.date).fetch()
 
 		for img in images:
-			blobstore.delete(img.serving_size_key)
-			blobstore.delete(img.original_size_key)
+			filestore.delete(img.serving_size_key)
+			filestore.delete(img.original_size_key)
 			img.key.delete()
 
 		emails = RawMail.query(RawMail.date == post.date).fetch()

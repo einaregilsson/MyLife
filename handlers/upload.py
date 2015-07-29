@@ -1,20 +1,21 @@
 from __future__ import with_statement
-import webapp2, time, logging, json, zipfile, datetime, re, traceback
+import webapp2, time, logging, json, zipfile, datetime, re, traceback, filestore
 from StringIO import StringIO
 from models.post import Post
 from models.importtask import ImportTask
 from models.userimage import UserImage
 from models.postcounter import PostCounter
-from google.appengine.ext import ndb, blobstore
+from google.appengine.ext import ndb
 from google.appengine.ext.webapp import blobstore_handlers
 from google.appengine.api import taskqueue
 from errorhandling import log_error
 
 class UploadFinishedHandler(blobstore_handlers.BlobstoreUploadHandler):
 	def post(self):
-		upload = self.get_uploads()[0]
+
+		file_info = self.get_file_infos()[0]
 		task = ImportTask(
-			blob_key = upload.key()
+			uploaded_file = file_info.gs_object_name
 			)
 		task.put()
 
@@ -39,7 +40,7 @@ class ImportHandler(webapp2.RequestHandler):
 		try:
 
 
-			posts, images = self.read_zip_file(import_task.blob_key)
+			posts, images = self.read_zip_file(import_task.uploaded_file)
 
 			import_task.update('Importing...', total_photos=len(images), total_posts=len(posts))
 			logging.info('Importing %s posts, %s images' % (len(posts), len(images)))
@@ -92,10 +93,10 @@ class ImportHandler(webapp2.RequestHandler):
 			
 			import_task.update(msg, status='finished')
 			logging.info(import_task.message)
-			blobstore.delete(import_task.blob_key)
+			filestore.delete(import_task.uploaded_file)
 		except Exception, ex:
 			try:
-				blobstore.delete(import_task.blob_key)
+				filestore.delete(import_task.uploaded_file)
 			except:
 				pass
 				
@@ -106,9 +107,8 @@ class ImportHandler(webapp2.RequestHandler):
 			import_task.update('Failed to import: %s' % ex, status='failed')
 			log_error('Failed import', traceback.format_exc(6))
 
-	def read_zip_file(self, blob_key):
-		blob_reader = blobstore.BlobReader(blob_key, buffer_size=1048576)
-		zip_data = blob_reader.read()
+	def read_zip_file(self, uploaded_file):
+		zip_data = filestore.read(uploaded_file)
 
 		zip = zipfile.ZipFile(StringIO(zip_data))
 

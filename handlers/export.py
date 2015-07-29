@@ -1,12 +1,12 @@
 from __future__ import with_statement
-import webapp2, time, zipfile, re, datetime, logging, json
+import webapp2, time, zipfile, re, datetime, logging, json, filestore
 from StringIO import StringIO
 from models.post import Post
 from models.userimage import UserImage
 from models.exporttask import ExportTask
-from google.appengine.ext import ndb, blobstore
+from google.appengine.ext import ndb
 from google.appengine.ext.webapp import blobstore_handlers
-from google.appengine.api import taskqueue, files
+from google.appengine.api import taskqueue
 
 class ExportStartHandler(webapp2.RequestHandler):
 	def post(self):
@@ -29,7 +29,6 @@ class ExportHandler(webapp2.RequestHandler):
 		try:
 			day_string = datetime.datetime.today().strftime('%Y-%m-%d')
 			zip_filename = 'export_%s.zip' % day_string
-			
 			logging.info('Starting export task')
 
 			self.cleanup_old_export_tasks()
@@ -43,9 +42,9 @@ class ExportHandler(webapp2.RequestHandler):
 			archive.close()
 			
 			export_task.update('Saving zip file...')
-			blob_key = self.create_zip_blob(buffer, zip_filename)
+			self.create_zip_blob(buffer, zip_filename)
 
-			export_task.update('Finished creating zip', status='finished', blob_key=blob_key, filename=zip_filename)
+			export_task.update('Finished creating zip', status='finished', filename=zip_filename)
 
 			self.enqueue_for_deletion(export_task)
 
@@ -53,7 +52,7 @@ class ExportHandler(webapp2.RequestHandler):
 
 			export_task.update('Failed to export: %s' % ex, status='failed')
 		
-			logging.error('Failed export: %s' % ex)
+			logging.error('Failed export: %s' % ex.message)
 
 
 	def add_posts_to_zip(self, export_task, archive, day_string):
@@ -88,7 +87,7 @@ class ExportHandler(webapp2.RequestHandler):
 		for ex in ExportTask.query().fetch():
 			if ex.status in ('finished', 'failed'):
 				try:
-					blobstore.delete(ex.blob_key)
+					filestore.delete(ex.filename)
 				except:
 					pass
 				ex.key.delete()
@@ -106,7 +105,7 @@ class ExportHandler(webapp2.RequestHandler):
 		export_task.update('Found %s images...' % len(images))
 
 		for i, img in enumerate(images):
-			img_data = blobstore.BlobReader(img.original_size_key, buffer_size=1048576).read()
+			img_data = filestore.read(img.original_size_key)
 			archive.writestr('/img_%s' % img.filename.replace('.jpg', '.jpeg'), img_data)
 			if i % 5 == 0:
 				export_task.update('Added %s of %s images to zip... ' % (i+1,len(images)))
@@ -114,14 +113,7 @@ class ExportHandler(webapp2.RequestHandler):
 		export_task.update('Finished adding images...')
 
 	def create_zip_blob(self, buffer, filename):
-		file_name = files.blobstore.create(mime_type="application/zip",_blobinfo_uploaded_filename=filename)
-
-		with files.open(file_name, 'a') as f:
-			f.write(buffer.getvalue())
-
-		files.finalize(file_name)
-
-		return files.blobstore.get_blob_key(file_name)			
+		filestore.write(filename, buffer.getvalue(), content_type='application/zip')
 
 class ExportStatusHandler(webapp2.RequestHandler):
 	def get(self, id):
@@ -137,11 +129,10 @@ class ExportDownloadHandler(blobstore_handlers.BlobstoreDownloadHandler):
     	export = ExportTask.query(UserImage.filename == filename).get()
     	
 
-        if not export or not blobstore.get(export.blob_key):
+        if not export:
             self.error(404)
         else:
-            self.send_blob(export.blob_key)
-	        #TODO: Delete export...
+			self.send_blob(filestore.get_blob_key(export.filename))
 
 class ExportDeleteHandler(webapp2.RequestHandler):
 	def post(self):
@@ -153,7 +144,7 @@ class ExportDeleteHandler(webapp2.RequestHandler):
 			return
 
 		try:
-			blobstore.delete(export_task.blob_key)
+			filestore.delete(export_task.filename)
 		except:
 			logging.info('Failed to delete export blob')
 		

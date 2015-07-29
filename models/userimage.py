@@ -1,7 +1,6 @@
-import datetime, logging, re
+import datetime, logging, re, filestore
 from google.appengine.ext import ndb, blobstore
-from google.appengine.api import images, files
-
+from google.appengine.api import images
 
 class UserImage(ndb.Model):
 	original_size_key = ndb.StringProperty()
@@ -25,23 +24,49 @@ class UserImage(ndb.Model):
 
 		extension = original_filename.lower().split('.')[-1].replace('jpeg', 'jpg')
 
-		return date.strftime('%Y-%m-%d-') + str(img_counter) + '.' + extension
+		name = date.strftime('%Y-%m-%d-') + str(img_counter) 
+		return name + '.' + extension
+
+
+	def migrate_to_gcs(self):
+		if self.original_size_key == self.filename:
+			raise Exception('This image (%s) looks like it already is in GCS' % self.filename)
+
+		content_type = self.get_content_type(self.filename)
+
+		image_bytes = blobstore.BlobReader(self.original_size_key, buffer_size=1048576).read()
+		small_image_bytes = blobstore.BlobReader(self.serving_size_key, buffer_size=1048576).read()
+
+		self.original_size_key = self.filename
+		self.serving_size_key = self.get_small_image_name(self.filename)
+
+		filestore.write(self.original_size_key, image_bytes, content_type)
+		filestore.write(self.serving_size_key, small_image_bytes, content_type)
+
+		self.put()
+
+	def get_content_type(self, filename):
+
+		ln = filename.lower()
+		if ln.endswith('.jpg') or ln.endswith('.jpeg'):
+			return 'image/jpg'
+		elif ln.endswith('.png'):
+			return 'image/png'
+		elif ln.endswith('.gif'):
+			return 'image/gif'
+		elif ln.endswith('.bmp'):
+			return 'image/bmp'
+		else:
+			raise Exception('Unexpected image type: %s' % filename)
+
+	def get_small_image_name(self, filename):
+		return filename[:-4] + '-small' + filename[-4:]
 
 	def import_image(self, filename, original_filename, bytes, date):
 
-		ln = original_filename.lower()
-		if ln.endswith('.jpg') or ln.endswith('.jpeg'):
-			mime_type = 'image/jpg'
-		elif ln.endswith('.png'):
-			mime_type = 'image/png'
-		elif ln.endswith('.gif'):
-			mime_type = 'image/gif'
-		elif ln.endswith('.bmp'):
-			mime_type = 'image/bmp'
-		else:
-			raise Exception('Unexpected image type: %s' % original_filename)
-
-		self.original_size_key = str(self._create_image(mime_type, bytes, original_filename))
+		content_type = self.get_content_type(original_filename)
+		self.original_size_key = filename
+		filestore.write(self.original_size_key, bytes, content_type)
 
 		MAX_SIZE = 500
 		image = images.Image(bytes)
@@ -60,18 +85,9 @@ class UserImage(ndb.Model):
 			logging.info('Resizing %s from %sx%s to %sx%s' % (original_filename, image.width, image.height, new_width, new_height))
 			resized_bytes = images.resize(bytes, MAX_SIZE, MAX_SIZE)
 
-		self.serving_size_key = str(self._create_image(mime_type, resized_bytes, filename))
+
+		self.serving_size_key = self.get_small_image_name(filename)
+		filestore.write(self.serving_size_key, resized_bytes, content_type)
 		self.original_filename = original_filename
 		self.filename = filename
 		self.date = date
-		
-
-	def _create_image(self, mime_type, bytes, original_name):
-		file_name = files.blobstore.create(mime_type=mime_type,_blobinfo_uploaded_filename=original_name)
-
-		with files.open(file_name, 'a') as f:
- 			f.write(bytes)
-
-		files.finalize(file_name)
-
-		return files.blobstore.get_blob_key(file_name)

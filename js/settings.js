@@ -116,3 +116,38 @@ $('#zip').change(function() {
 	}
 });
 
+
+
+
+
+// Migration of images to Google Cloud Storage
+
+function migrateToGcs() {
+	disableAll();
+	$.post('/migrate/start', function(data) {
+		$('#migrate-progress').html(data.message);
+		var id = data.id;
+
+		function getStatus() {
+			$.getJSON('/migrate/status/' + id, function(result) {
+				if (result.status == 'finished'){
+					$('#migrate-progress').html(result.message);
+					enableAll();
+					$('#migrate-to-gcs').attr('disabled', 'disabled');
+				} else if (result.status == 'failed') {
+					$('#migrate-progress').css('color', 'red').html(result.message);
+					enableAll();
+				} else {
+					if (result.message) {
+						$('#migrate-progress').html(result.message);
+					}
+					setTimeout(getStatus, 1000);
+				}
+			});
+		}
+		getStatus();
+	});	
+}
+
+$('#migrate-to-gcs').click(migrateToGcs);
+

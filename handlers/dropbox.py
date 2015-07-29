@@ -1,6 +1,6 @@
 from google.appengine.ext.webapp.mail_handlers import InboundMailHandler
 from google.appengine.runtime import apiproxy_errors
-from google.appengine.ext import ndb, blobstore
+from google.appengine.ext import ndb
 from models.rawmail import RawMail
 from models.post import Post
 from models.settings import Settings
@@ -8,7 +8,7 @@ from models.userimage import UserImage
 from models.slug import Slug
 from models.userimage import UserImage
 from models.postcounter import PostCounter
-import re, logging, exceptions, traceback, webapp2, json, datetime
+import re, logging, exceptions, traceback, webapp2, json, datetime, filestore
 from errorhandling import log_error
 from google.appengine.api import urlfetch
 from StringIO import StringIO
@@ -59,7 +59,7 @@ class DropboxBackupHandler(webapp2.RequestHandler):
 			self.log('Found %s images that need to be backed up in Dropbox' % images_total)
 			for img in images:
 				self.log('Backing up %s' % img.filename)
-				bytes = blobstore.BlobReader(img.original_size_key, buffer_size=1048576).read()
+				bytes = filestore.read(img.original_size_key)
 				result = self.put_file(headers, img.filename, bytes)
 				self.log('Backed up %s. Revision: %s' % (img.filename, result['revision']))
 				img.backed_up_in_dropbox = True

@@ -2,12 +2,9 @@ import datetime
 from google.appengine.ext import ndb
 
 
-class ImportTask(ndb.Model):
-	uploaded_file = ndb.StringProperty()
-	total_posts = ndb.IntegerProperty(default=0)
-	total_photos = ndb.IntegerProperty(default=0)
-	imported_posts = ndb.IntegerProperty(default=0)
-	imported_photos = ndb.IntegerProperty(default=0)
+class MigrateTask(ndb.Model):
+	total_images = ndb.IntegerProperty(default=0)
+	migrated_images = ndb.IntegerProperty(default=0)
 	created = ndb.DateTimeProperty(auto_now_add=True)
 	updated = ndb.DateTimeProperty(auto_now=True)
 	status = ndb.StringProperty(choices=['new', 'inprogress', 'finished', 'failed'],default='new')

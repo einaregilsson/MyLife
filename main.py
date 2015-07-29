@@ -9,6 +9,7 @@ from handlers.edit import EditHandler, AddPhotoHandler, GetPhotoUploadUrlHandler
 from handlers.export import ExportHandler, ExportDeleteHandler, ExportDownloadHandler, ExportStartHandler, ExportStatusHandler
 from handlers.frontpage import FrontPageHandler, FrontPagePostHandler
 from handlers.image import ImageHandler
+from handlers.migratecloudstorage import MigrateStartHandler, MigrateHandler, MigrateStatusHandler
 from handlers.past import PastHandler
 from handlers.postdates import PostDatesHandler
 from handlers.receivemail import ReceiveMailHandler
@@ -35,6 +36,9 @@ app = webapp2.WSGIApplication([
 	(r'/image/(.*)', ImageHandler),
 	(r'/import', ImportHandler),
 	(r'/import/status/(.*)', ImportStatusHandler),
+	(r'/migrate/start', MigrateStartHandler),
+	(r'/migrate/run', MigrateHandler),
+	(r'/migrate/status/(.*)', MigrateStatusHandler),
 	(r'/past(?:/(\d\d\d\d)-(\d\d))?', PastHandler),
 	(r'/postdates/(\d\d\d\d)-(\d\d)', PostDatesHandler),
 	(r'/sendmail', SendMailHandler),
