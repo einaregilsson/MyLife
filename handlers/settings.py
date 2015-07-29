@@ -3,7 +3,7 @@ from templates import get_template
 from models.settings import Settings
 from models.timezones import timezones
 from models.migratetask import MigrateTask
-from google.appengine.api import modules
+
 class SettingsHandler(webapp2.RequestHandler):
 	def get(self):
 		self._render(Settings.get())
