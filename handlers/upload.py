@@ -1,5 +1,5 @@
 from __future__ import with_statement
-import webapp2, time, logging, json, zipfile, datetime, re, traceback, filestore
+import webapp2, time, logging, json, zipfile, datetime, re, traceback, filestore, json
 from StringIO import StringIO
 from models.post import Post
 from models.importtask import ImportTask
@@ -14,6 +14,9 @@ class UploadFinishedHandler(blobstore_handlers.BlobstoreUploadHandler):
 	def post(self):
 
 		file_info = self.get_file_infos()[0]
+		#for i in dir(file_info):
+		#	if not '__' in i:
+		#		logging.info('%s is %s' % (i, getattr(file_info, i)))
 		task = ImportTask(
 			uploaded_file = file_info.gs_object_name
 			)
@@ -115,20 +118,32 @@ class ImportHandler(webapp2.RequestHandler):
 		text = None
 		images = {}
 
-		for name in zip.namelist():
-			if name.endswith('.txt'):
-				text = zip.read(name)
-			else:
-				images[re.sub('^/', '', name)] = zip.read(name)
+		good_names = [n for n in zip.namelist() if not '__MACOSX' in n]
+
+		text_files = [n for n in good_names if n.endswith('.txt') and not '__MACOSX' in n]
+		image_files = [n for n in good_names if re.search('\\.(jpe?g|bmp|png|gif|tiff)$', n, re.I)]
 		
+		if len(text_files) > 1:
+			raise Exception('More than one possible text files in zip file: %s' % ','.join(text_files))
+
+		other_files = [n for n in good_names if not n in text_files + image_files]
+
+		if len(other_files) > 0:
+			raise Exception('Got files that we don\'t know how to handle: %s' % ','.join(other_files))
+
+		text = zip.read(text_files[0])
+
+		for name in image_files:
+			images[re.sub('^/', '', name)] = zip.read(name)
 
 		text = text.replace('\r\n', '\n').strip()
 
 		lines = text.split('\n')
 		posts = []
-
 		prev_line_empty = True
 		current_date, current_text = None, ''
+
+		
 		for i,line in enumerate(lines):
 			next_line_empty = i == len(lines)-1 or lines[i+1] == ''
 			m = re.match(r'^(\d\d\d\d)-(\d\d)-(\d\d)$', line)
@@ -143,7 +158,7 @@ class ImportHandler(webapp2.RequestHandler):
 
 			prev_line_empty = line == ''
 
-		if current_text:
+		if current_text.strip() and current_date:
 			posts.append((current_date, current_text.rstrip()))
 
 		return posts, images
