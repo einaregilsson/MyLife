@@ -1,12 +1,29 @@
 import webapp2, filestore
 from templates import get_template
 from models.settings import Settings
+from models.userimage import UserImage
 from models.timezones import timezones
 from models.migratetask import MigrateTask
 
 class SettingsHandler(webapp2.RequestHandler):
 	def get(self):
-		self._render(Settings.get())
+
+		#Check whether the migration is done so we can see whether to show the Blobstore Migration
+		#or not...
+		settings = Settings.get()
+
+		if not settings.blobstore_migration_done:
+			migration_task_finished = bool(MigrateTask.query(MigrateTask.status == 'finished').get())
+			if migration_task_finished:
+				settings.blobstore_migration_done = True
+				settings.put()
+			else:
+				#Try to figure out whether this is a new user that has nothing in the blobstore...
+				if not UserImage.query().get():
+					settings.blobstore_migration_done = True
+					settings.put()
+
+		self._render(settings)
 
 	def post(self):
 		settings = Settings.get()
