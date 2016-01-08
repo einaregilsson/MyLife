@@ -159,7 +159,7 @@ class ImportHandler(webapp2.RequestHandler):
 			prev_line_empty = line == ''
 
 		if current_text.strip() and current_date:
-			posts.append((current_date, current_text.rstrip()))
+			posts.append((current_date, current_text.strip()))
 
 		return posts, images
 

@@ -3,6 +3,15 @@
 
 {%block main_content%}
 <h3>Settings</h3>
+{%if not bucket_exists%}
+<div id="bucket-warning">
+	It looks like you have not set up a Google Cloud Storage bucket yet. MyLife will not work correctly until you do,
+	image uploads, import/export and various other things need Google Cloud Storage to work. Please follow the instructions
+	in <a href="http://einaregilsson.com/mylife-a-single-user-ohlife-alternative/#setup-bucket">this blog post</a> to set up 
+	your bucket! If you come back to this page after setting up your bucket then you should no longer see this warning. You should
+	also try writing a post and uploading an image to make sure the bucket works like it should.
+</div>
+{%endif%}
 
 <div id="user-settings">
 	<form method="POST" action="/settings">

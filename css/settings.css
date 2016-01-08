@@ -1,3 +1,14 @@
+#bucket-warning {
+	border:solid 2px red;
+	color:red;
+	background:#ffe5e5;
+	margin:10px;
+	padding:5px;
+	border-radius:3px;
+	font-size:16px;
+	line-height: 20px;
+}
+
 #user-settings {
 	margin-top:20px;
 	margin-bottom:40px;

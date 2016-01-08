@@ -66,7 +66,7 @@ class ExportHandler(webapp2.RequestHandler):
 		for p in Post.query().order(Post.date).fetch():
 			post_text += p.date.strftime('%Y-%m-%d')
 			post_text += '\r\n\r\n'
-			post_text += p.text.replace('\r\n', '\n').replace('\n', '\r\n').rstrip()
+			post_text += p.text.replace('\r\n', '\n').replace('\n', '\r\n').strip()
 			post_text += '\r\n\r\n'
 
 		archive.writestr('/export_%s.txt' % day_string, post_text.encode('utf-8'))

@@ -48,6 +48,7 @@ class SettingsHandler(webapp2.RequestHandler):
 			"upload_url" : filestore.create_upload_url('/upload-finished'),
 			"saved" : saved,
 			"can_migrate_images" : not settings.blobstore_migration_done,
+			"bucket_exists" : filestore.bucket_exists(),
 			"version" : open('VERSION').read()
 		}
 		self.response.write(get_template('settings.html').render(data))
