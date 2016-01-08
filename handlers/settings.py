@@ -47,7 +47,7 @@ class SettingsHandler(webapp2.RequestHandler):
 			"include_old_post_in_entry" : settings.include_old_post_in_entry,
 			"upload_url" : filestore.create_upload_url('/upload-finished'),
 			"saved" : saved,
-			"can_migrate_images" : not bool(MigrateTask.query(MigrateTask.status == 'finished').get()),
+			"can_migrate_images" : not settings.blobstore_migration_done,
 			"version" : open('VERSION').read()
 		}
 		self.response.write(get_template('settings.html').render(data))
