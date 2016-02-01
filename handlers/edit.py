@@ -146,7 +146,7 @@ class EditHandler(webapp2.RequestHandler):
 
 		emails = RawMail.query(RawMail.date == post.date).fetch()
 		for email in emails:
-			email.delete()
+			email.key.delete()
 
 		post.key.delete()
 		PostCounter.get().decrement(post.date.year, post.date.month)
