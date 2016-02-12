@@ -10,7 +10,7 @@ from errorhandling import log_error
 
 class DailyMail():
 	
-	def send(self, is_intro_email=False):
+	def send(self, is_intro_email=False, force_send=False, date=None):
 
 		try:
 			now = datetime.datetime.now()
@@ -22,25 +22,35 @@ class DailyMail():
 			else:
 				current_time, id, name, offset = self.get_time_in_timezone(settings)
 
-				if current_time.hour != settings.email_hour:
+				if current_time.hour != settings.email_hour and not force_send:
 					logging.info('Current time for %s is %s, not sending email now, will send at %02d:00' % (name, current_time, settings.email_hour))
 					return
 
 
-			today = current_time.date()
+			if date and force_send:
+				today = date #Allow overriding this stuff
+			else:
+				today = current_time.date()
 			
-			if self.check_if_intro_email_sent_today(today):
+			if self.check_if_intro_email_sent_today(today) and not force_send:
 				logging.info('Already sent the intro email today, skipping this email for now')	
 				return	
 
-			self.check_if_mail_already_sent(today)	
 
+			#Check if we've already sent an email
+			slug = Slug.query(Slug.date == today).get()
 
-			slug_id = self.get_slug()
+			if slug and not force_send:
+				msg = 'Tried to send another email on %s, already sent %s' % (date, existing_slug.slug)
+				log_error('Tried to send email again', msg)
+				raise Exception(msg)
 
-			slug = Slug(slug=slug_id, date=today)
+			if not slug:
+				slug_id = self.get_slug()
 
-			slug.put()
+				slug = Slug(slug=slug_id, date=today)
+
+				slug.put()
 
 			subject = "It's %s, %s %s - How did your day go?" % (today.strftime('%A'), today.strftime("%b"), today.day)
 			app_id = app_identity.get_application_id()
@@ -58,8 +68,6 @@ class DailyMail():
 Just reply to this email with your entry.
 
 OLD_POST
-You can see your past entries here:
-https://APP_ID.appspot.com/past
 
 	""".replace('APP_ID', app_id)
 
@@ -75,7 +83,6 @@ w3.org/TR/html4/loose.dtd">
 	<br>
 	<br>
 OLD_POST
-	<a href="https://APP_ID.appspot.com/past">Past entries</a>
 	</body>
 </html>
 """.replace('APP_ID', app_id)
@@ -137,15 +144,6 @@ OLD_POST
 			slug = str(uuid.uuid4())[0:13].replace('-', '')		
 
 		return slug
-
-	def check_if_mail_already_sent(self, date):
-		#Check if we've already sent an email
-		existing_slug = Slug.query(Slug.date == date).get()
-
-		if existing_slug:
-			msg = 'Tried to send another email on %s, already sent %s' % (date, existing_slug.slug)
-			log_error('Tried to send email again', msg)
-			raise Exception(msg)
 
 	def check_if_intro_email_sent_today(self, date):
 		two_slugs = [s for s in Slug.query().fetch(2)]
