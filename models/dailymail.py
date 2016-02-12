@@ -41,7 +41,7 @@ class DailyMail():
 			slug = Slug.query(Slug.date == today).get()
 
 			if slug and not force_send:
-				msg = 'Tried to send another email on %s, already sent %s' % (date, existing_slug.slug)
+				msg = 'Tried to send another email on %s, already sent %s' % (date, slug.slug)
 				log_error('Tried to send email again', msg)
 				raise Exception(msg)
 
