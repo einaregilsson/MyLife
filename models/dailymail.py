@@ -1,10 +1,11 @@
-import traceback
+import traceback, random
 from google.appengine.api import mail
 import datetime, uuid, re, logging, os
 from models.slug import Slug
 from models.post import Post
 from models.settings import Settings
 from models.timezones import timezones
+from models.postcounter import PostCounter
 from google.appengine.api import app_identity
 from errorhandling import log_error
 
@@ -96,7 +97,7 @@ OLD_POST
 				old_post, old_type = self.get_old_post(today)
 
 				if old_post and settings.include_old_post_in_entry:
-					logging.info('Going to use old post because' % (old_post, settings.include_old_post_in_entry))
+					logging.info('Going to use old post %s because %s' % (old_post, settings.include_old_post_in_entry))
 
 					old_post_text = 'Remember this? One %s ago you wrote:\r\n\r\n' % old_type
 					old_post_text += old_post.text.rstrip() + '\r\n\r\n'
@@ -106,7 +107,7 @@ OLD_POST
 					old_post_text = re.sub(r'\r?\n', '<br>', old_post_text)
 					message.html = re.sub(r'OLD_POST\r?\n', old_post_text, message.html)
 				else:
-					logging.info('Not using Old post because ' % (old_post, settings.include_old_post_in_entry))
+					logging.info('Not using Old post %s because %s' % (old_post, settings.include_old_post_in_entry))
 					message.body = re.sub('OLD_POST\r?\n', '', message.body)
 					message.html = re.sub('OLD_POST\r?\n', '', message.html)
 
@@ -175,12 +176,21 @@ OLD_POST
 				old_type = 'month'
 
 		if not old_post:
+			# lets try a week ago
 			week_ago = today + datetime.timedelta(days=-7)
 			old_post = Post.query(Post.date == week_ago).get()
 			old_type = 'week'
 
 		if not old_post:
-			logging.info('Looked for but didnt find old_post' % (old_post))
+			# lets try a completely random post
+			count = PostCounter.get().count
+			old_list = Post.query().fetch(1, offset=random.randint(0, count-1))
+			old_post = old_list[0]
+			old_type = 'random'
+
+
+		if not old_post:
+			logging.info('Looked for but didnt find old_post %s' % (old_post))
 			return None, None
 		else:
 			logging.info('Found and returning old_post')
