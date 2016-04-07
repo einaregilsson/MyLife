@@ -1,7 +1,7 @@
 cron:
 - description: Send daily post
   url: /sendmail
-  schedule: every 60 minutes synchronized
+  schedule: every 120 minutes synchronized
 
 - description: Backup to Dropbox
   url: /backup/dropbox
