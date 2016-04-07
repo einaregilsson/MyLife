@@ -96,6 +96,8 @@ OLD_POST
 				old_post, old_type = self.get_old_post(today)
 
 				if old_post and settings.include_old_post_in_entry:
+					logging.info('Going to use old post because' % (old_post, settings.include_old_post_in_entry))
+
 					old_post_text = 'Remember this? One %s ago you wrote:\r\n\r\n' % old_type
 					old_post_text += old_post.text.rstrip() + '\r\n\r\n'
 
@@ -104,6 +106,7 @@ OLD_POST
 					old_post_text = re.sub(r'\r?\n', '<br>', old_post_text)
 					message.html = re.sub(r'OLD_POST\r?\n', old_post_text, message.html)
 				else:
+					logging.info('Not using Old post because ' % (old_post, settings.include_old_post_in_entry))
 					message.body = re.sub('OLD_POST\r?\n', '', message.body)
 					message.html = re.sub('OLD_POST\r?\n', '', message.html)
 
@@ -177,8 +180,10 @@ OLD_POST
 			old_type = 'week'
 
 		if not old_post:
+			logging.info('Looked for but didnt find old_post' % (old_post))
 			return None, None
 		else:
+			logging.info('Found and returning old_post')
 			return old_post, old_type
 
 
