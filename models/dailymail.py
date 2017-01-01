@@ -99,7 +99,10 @@ OLD_POST
 				if old_post and settings.include_old_post_in_entry:
 					logging.info('Going to use old post %s because %s' % (old_post, settings.include_old_post_in_entry))
 
-					old_post_text = 'Remember this? One %s ago you wrote:\r\n\r\n' % old_type
+					if (old_type == 'random'):
+						old_post_text = 'Remember this? On %s you wrote:\r\n\r\n' % old_post.date
+					else:
+						old_post_text = 'Remember this? One %s ago you wrote:\r\n\r\n' % old_type
 					old_post_text += old_post.text.rstrip() + '\r\n\r\n'
 
 					message.body = re.sub(r'OLD_POST\r?\n', old_post_text, message.body)
