@@ -100,7 +100,7 @@ OLD_POST
 					logging.info('Going to use old post %s because %s' % (old_post, settings.include_old_post_in_entry))
 
 					if (old_type == 'random'):
-						old_post_text = 'Remember this? On %s you wrote:\r\n\r\n' % old_post.date
+						old_post_text = 'Remember this? On <b>%s, %s %s, %s</b> you wrote:\r\n\r\n' % (old_post.date.strftime('%A'), old_post.date.strftime("%b"), old_post.date.day, old_post.date.strftime("%Y"))
 					else:
 						old_post_text = 'Remember this? One %s ago you wrote:\r\n\r\n' % old_type
 					old_post_text += old_post.text.rstrip() + '\r\n\r\n'
