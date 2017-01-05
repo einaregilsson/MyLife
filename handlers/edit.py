@@ -30,7 +30,7 @@ class AddPhotoHandler(blobstore_handlers.BlobstoreUploadHandler):
 
 		filename = UserImage.create_image_name(file_info.filename, date, existing_images)
 		img = UserImage()
-		img.import_image(filename, file_info.filename, bytes, date)
+		img.import_image(filename, file_info.filename, bytes, date, None)
 		img.put()
 		filestore.delete(file_info.gs_object_name)
 		#If there's a post here we should add the image...
@@ -57,6 +57,7 @@ class DeletePhotoHandler(webapp2.RequestHandler):
 		if post:
 			try:
 				post.images.remove(filename)
+				post.text = post.text.replace('$IMG:' + filename, '').replace('\n\n\n\n', '\n\n')
 			except:
 				pass
 

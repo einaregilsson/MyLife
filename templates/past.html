@@ -39,12 +39,14 @@
 	<h4>{{post.date.strftime('%A')}}</h4>
 	{%if post.images %}
 	{%for img in post.images%}
+		{%if not img in post.text%}
 		<div class="image">
 			<a href="/image/{{img}}?fullsize=1"><img src="/image/{{img}}" /></a>
 		</div>
+		{%endif%}
 	{%endfor%}
 	{%endif%}
-	<div>{{post.text|nl2br}}</div>
+	<div>{{post.text|img2tags|nl2br}}</div>
 </div>
 <hr>
 {%endfor%}

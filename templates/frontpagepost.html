@@ -18,13 +18,15 @@
 
 		{%if post.images %}
 			{%for img in post.images%}
+				{%if not img in post.text%}
 				<div class="image">
 					<a href="/image/{{img}}?fullsize=1"><img src="/image/{{img}}"/></a>
 				</div>
+				{%endif%}
 			{%endfor%}
 		{%endif%}
 		
-		<div class="post-text">{{post.text|nl2br}}</div>
+		<div>{{post.text|img2tags|nl2br}}</div>
 	</div>
 {%else%}
 	{%if first_time%}

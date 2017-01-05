@@ -6,6 +6,8 @@ class UserImage(ndb.Model):
 	original_size_key = ndb.StringProperty()
 	serving_size_key = ndb.StringProperty()
 	original_filename = ndb.StringProperty()
+	email_attachment_content_id = ndb.StringProperty()
+	is_inline = ndb.BooleanProperty(default=False)
 	filename = ndb.StringProperty()
 	date = ndb.DateProperty()
 	created = ndb.DateTimeProperty(auto_now_add=True)
@@ -62,7 +64,7 @@ class UserImage(ndb.Model):
 	def get_small_image_name(self, filename):
 		return filename[:-4] + '-small' + filename[-4:]
 
-	def import_image(self, filename, original_filename, bytes, date):
+	def import_image(self, filename, original_filename, bytes, date, email_attachment_content_id):
 
 		content_type = self.get_content_type(original_filename)
 		self.original_size_key = filename
@@ -90,4 +92,6 @@ class UserImage(ndb.Model):
 		filestore.write(self.serving_size_key, resized_bytes, content_type)
 		self.original_filename = original_filename
 		self.filename = filename
+
+		self.email_attachment_content_id = email_attachment_content_id
 		self.date = date

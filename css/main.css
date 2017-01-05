@@ -147,6 +147,11 @@ h2 {
 	max-width:90%;
 }
 
+.post p img {
+	display:block;
+	margin:auto;
+	box-shadow: #333 0px 0px 4px;	
+}
 
 .active {
 	background:#538bb6;

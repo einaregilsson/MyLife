@@ -1,14 +1,9 @@
 
-# Or, just leave this as is, and use the command
+# Deploy your app with
 #
-#    appcfg.py -A yourrealappid update . 
+#    gcloud app deploy --project yourappid
 #
-# to deploy the app. At least if you fork this on GitHub I would recommend 
-# to not commit this file with your real appid. The journal is private,
-# so there should be no need for others to know your appid, and if they
-# don't know it they can't try to send emails to the mail handler, or
-# otherwise try to mess with your site. (You know, because people are
-# just lining up to try to DDOS your personal journal ;)
+# where "yourappid" is the actual id of your personal MyLife installation.
 
 runtime: python27
 api_version: 1

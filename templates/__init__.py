@@ -24,4 +24,15 @@ def nl2br(eval_ctx, value):
         result = Markup(result)
     return result	
 
+@evalcontextfilter
+def img2tags(eval_ctx, value):
+    import re
+    result = re.sub(r'\$IMG:([0-9a-zA-Z\.-]+)', '<a href="/image/\\1?fullsize=1" target="_blank"><img src="/image/\\1"/></a>', value)
+
+    if eval_ctx.autoescape:
+        result = Markup(result)
+    return result
+
+
 JINJA_ENVIRONMENT.filters['nl2br'] = nl2br    
+JINJA_ENVIRONMENT.filters['img2tags'] = img2tags    

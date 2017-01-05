@@ -36,6 +36,16 @@ def strip_html(text):
         
         return text # leave as is
     
+    #OK, first lets see if we have any images in the html...
+
+    image_tags = re.findall('<img[^>]*>', text)
+    for tag in image_tags:
+    	match = re.search('\\bcid:(\\w+)', tag)
+    	if match:
+    		content_id = match.group(1)
+    		text = text.replace(tag, '\r\n\r\n$IMG:' + content_id + '\r\n\r\n') #These can then be replaced later...
+
+
     return re.sub("(?s)<[^>]*>|&#?\w+;", fixup, text)
 
 class ReceiveMailHandler(InboundMailHandler):
@@ -140,7 +150,13 @@ class ReceiveMailHandler(InboundMailHandler):
 		if attachments:
 			logging.info('Received %s attachment(s)' % len(attachments))
 		
-		for original_filename, encoded_payload in attachments:
+		for attachment in attachments:
+			
+ 			original_filename = attachment.filename
+ 			encoded_payload = attachment.payload
+ 			content_id = attachment.content_id
+ 			if content_id:
+ 				content_id = content_id.replace('<', '').replace('>', '') # Don't want these around the id, messes with our tag handling
 			logging.info('Processing attachment: %s' % original_filename)
 
 			if re.search('\\.(jpe?g|png|bmp|gif)$', original_filename.lower()):
@@ -154,8 +170,17 @@ class ReceiveMailHandler(InboundMailHandler):
 				post.has_images = True
 				user_image = UserImage()
 				img_name = UserImage.create_image_name(original_filename, post.date, post.images)
-				user_image.import_image(img_name, original_filename, bytes, post.date)
+				user_image.import_image(img_name, original_filename, bytes, post.date, content_id)
 				post.images.append(img_name)
+				
+				user_image.is_inline = False
+				if content_id:
+					placeholder = '$IMG:' + content_id
+					if placeholder in post.text:
+						user_image.is_inline = True
+						#Ok, lets put in a filename instead of the content_id
+						post.text = post.text.replace(placeholder, '$IMG:' + img_name)
+				
 				user_image.put()
 
 			else:

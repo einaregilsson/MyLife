@@ -22,7 +22,7 @@
 	<div class="post-images">
 		{%for img in images%} 
 		<div>
-			<a href="/image/{{img}}?fullsize=1" target="_blank" class="fullsize-image"><img src="/image/{{img}}" class="thumbnail" /></a>
+			<a href="/image/{{img}}?fullsize=1" target="_blank" class="fullsize-image" title="Add this image inline in the post by putting $IMG:{{img}} on its own line."><img src="/image/{{img}}" class="thumbnail" /></a>
 			<a class="delete-img" href="#delete-image" data-img="{{img}}">Delete</a>
 		</div>
 		{%endfor%}
